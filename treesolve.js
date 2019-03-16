@@ -12,7 +12,7 @@ function setup() {
   // initialize model
   // constants for geometry and force-directed model
   d = 20;  // node diameter
-  edgeLength = 50;  // equilibrium, "desired" edge length
+  edgeLength = 80;  // equilibrium, "desired" edge length
   forceConstant = 0.1;
   dampingConstant = Math.sqrt(forceConstant);  // this way, equilibrium is attained as fast as possible
   dt = 0.1;  // time step per frame

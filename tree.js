@@ -41,12 +41,19 @@ function Tree() {
       }
       
       // calculate the repellant force of every two nodes and add it to the total force vector
+      let repellAmplification;  // in the beginning, the repellant force is much stronger, to disentangle stuff
+      if (frameCount < 400) {  // TODO: fancy way would be to wait until no edges cross anymore OR until nothing moves anymore
+        //console.log(frameCount);
+        repellAmplification = 2000;
+      } else {
+        repellAmplification = 200;  // later, the repulsion is dialed down to make the whole graph more compact
+      }
       for (let node2 of this.nodes) {
         if (node2 != node) {
           let diff = p5.Vector.sub(node2.pos, node.pos);
           let dist = diff.mag();
           if (dist > 0) {
-            diff.setMag(2000*forceConstant/dist);
+            diff.setMag(repellAmplification*forceConstant/dist);
             totalForce.sub(diff);
           }
           //if (dist < 2*d) {
