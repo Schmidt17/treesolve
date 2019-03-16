@@ -8,8 +8,8 @@ function Tree() {
   
   this.makeNodePositions = function () {
      for (let node of this.nodes) {
-       node.pos.x = random(width/2-100, width/2+100);
-       node.pos.y = random(height/2-100, height/2+100);
+       node.pos.x = random(width/2-200, width/2+200);
+       node.pos.y = random(height/2-200, height/2+200);
      }
   }
   
@@ -27,14 +27,37 @@ function Tree() {
   
   this.updateForceDirected = function () {
     for (let node of this.nodes) {
+      let totalForce = createVector(0, 0);
+      
+      // calculate the friction force and add it to the total force vector
+      totalForce.add(p5.Vector.mult(node.vel, -dampingConstant));
+      
+      // calculate the spring force exerted by every connection and add it to the total force vector
       for (let connID of node.connectedIDs) {
         let diff = p5.Vector.sub(this.nodes[connID].pos, node.pos);
         let dist = diff.mag();
         diff.setMag(forceConstant*(dist - edgeLength));
-        node.vel.add(diff.mult(dt));
+        totalForce.add(diff);
       }
-      let tmpVel = node.vel.copy();
-      node.pos.add(tmpVel.mult(dt));
+      
+      // calculate the repellant force of every two nodes and add it to the total force vector
+      for (let node2 of this.nodes) {
+        if (node2 != node) {
+          let diff = p5.Vector.sub(node2.pos, node.pos);
+          let dist = diff.mag();
+          if (dist > 0) {
+            diff.setMag(2000*forceConstant/dist);
+            totalForce.sub(diff);
+          }
+          //if (dist < 2*d) {
+          //  diff.setMag(forceConstant*(dist - 2*d));
+          //  totalForce.add(diff);  
+          //}
+        }
+      }
+      
+      node.vel.add(totalForce.mult(dt));  // Euler-step the velocity
+      node.pos.add(p5.Vector.mult(node.vel, dt));  // Euler-step the position
     }
   }
   
@@ -66,5 +89,7 @@ function Node() {
     stroke(0);
     strokeWeight(1);
     ellipse(this.pos.x, this.pos.y, d, d);
+    fill(0);
+    text(str(this.tag), this.pos.x, this.pos.y);
   }
 }
